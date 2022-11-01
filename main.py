@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from functions import *
-from st_aggrid import AgGrid, GridOptionsBuilder
+
 
 streamlit_setup('F1 data Visualiser', 'wide')
 seasons = add_sidebar_select_box('Please choose a season', get_seasons(), 0)
