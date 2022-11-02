@@ -21,6 +21,7 @@ def load_lottie():
     with st.sidebar:
         st_lottie(lottie, height=100, key='car')
 
+
 @st.cache
 def get_seasons():
     seasons = []
@@ -45,7 +46,6 @@ def get_rounds(select_box):
         races.append(dataItem['raceName'])
 
     return races
-
 
 
 def get_race_details(year, round_number):
@@ -77,7 +77,7 @@ def get_race_details(year, round_number):
 
 
 def plot_chart():
-    fig = px.line(st.session_state.df, x='Laps', y=st.session_state.df.columns)
+    fig = px.line(st.session_state.df, x='Laps', y=st.session_state.df.columns).update_layout(yaxis_title="Seconds")
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -86,7 +86,25 @@ def create_state_dataframe():
         st.session_state.df = pd.DataFrame({})
 
 
-def get_laps_times(year, round_number, driver_id):
+def insert_line(number, is_sidebar):
+    for x in range(number):
+        if is_sidebar:
+            with st.sidebar:
+                st.markdown("***")
+        else:
+            st.markdown("***")
+
+
+def insert_empty_space(number, is_sidebar):
+    for x in range(number):
+        if is_sidebar:
+            with st.sidebar:
+                st.write('')
+        else:
+            st.write('')
+
+
+def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
     response = requests.request("GET", url)
     data = response.json()
@@ -102,17 +120,18 @@ def get_laps_times(year, round_number, driver_id):
                     times_lst.append(time)
 
         df_laps = pd.DataFrame({'Laps': laps_lst})
-        df_times = pd.DataFrame({driver_id: times_lst})
+        df_times = pd.DataFrame({driver_name: times_lst})
+
+        if 'Laps' not in st.session_state.df.columns:
+            st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
+
+        if driver_name not in st.session_state.df.columns:
+            st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
+        else:
+            st.session_state.df.drop(driver_name, axis=1)
+
     else:
         print('No data for this year')
-
-    if 'Laps' not in st.session_state.df.columns:
-        st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
-
-    if driver_id not in st.session_state.df.columns:
-        st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
-    else:
-        st.session_state.df.drop(driver_id, axis=1)
 
 
 def str_time_to_sec(time):
@@ -135,6 +154,11 @@ def get_driver_id(table):
     selected = selected[0]['DriverId']
     return selected
 
+def get_driver_name(table):
+    selected = table["selected_rows"]
+    selected = selected[0]['Driver']
+    return selected
+
 
 def streamlit_setup(title, layout):
     st.set_page_config(page_title=title, layout=layout)
@@ -146,7 +170,7 @@ def create_drivers_table(df: pd.DataFrame):
     options.configure_column('DriverId')
     options.configure_side_bar()
 
-    options.configure_selection('multiple', groupSelectsChildren=True, groupSelectsFiltered=True)
+    options.configure_selection('single', groupSelectsChildren=True, groupSelectsFiltered=True)
 
     selection = AgGrid(
         df,
@@ -161,8 +185,9 @@ def create_drivers_table(df: pd.DataFrame):
 
     return selection
 
+
 def clear_plot_button():
     with st.sidebar:
-        if st.button('Clear'):
+        if st.button('Clear plot'):
             for key in st.session_state.keys():
                 del st.session_state[key]
