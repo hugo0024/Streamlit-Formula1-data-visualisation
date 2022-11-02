@@ -35,7 +35,7 @@ if __name__ == '__main__':
             plot_chart()
         except ValueError:
             insert_empty_space(7, False)
-            st.markdown("<h1 style='text-align: center; color: grey;'>No lap times data for this year</h1>",
+            st.markdown("<h1 style='text-align: center; color: grey;'>No lap times data for this race</h1>",
                         unsafe_allow_html=True)
 
     else:

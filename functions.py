@@ -47,7 +47,7 @@ def get_rounds(select_box):
 
     return races
 
-
+@st.cache
 def get_race_details(year, round_number):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
     response = requests.request("GET", url)
@@ -103,7 +103,7 @@ def insert_empty_space(number, is_sidebar):
         else:
             st.write('')
 
-
+@st.cache
 def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
     response = requests.request("GET", url)
