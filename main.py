@@ -17,11 +17,11 @@ if __name__ == '__main__':
 
     details_table = create_drivers_table(df=df_race)
 
-    insert_empty_space(15, True)
-
     selection_status = check_selection_status(details_table)
 
     if selection_status:
+
+        insert_line(1, False)
 
         clear_plot_button()
 
@@ -38,4 +38,4 @@ if __name__ == '__main__':
     else:
         insert_empty_space(7, False)
         st.markdown("<h1 style='text-align: center; color: grey;'>Select from the table to compare lap times</h1>", unsafe_allow_html=True)
-
+        clear_session_df()

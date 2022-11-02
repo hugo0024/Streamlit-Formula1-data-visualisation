@@ -4,7 +4,6 @@ import streamlit as st
 import pandas as pd
 import re
 import plotly.express as px
-import plotly.graph_objects as go
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 from streamlit_lottie import st_lottie
@@ -69,7 +68,7 @@ def get_race_details(year, round_number):
         try:
             data_dict['Time'].append(dataItem['Time']['time'])
         except KeyError:
-            data_dict['Time'].append(None)
+            data_dict['Time'].append(dataItem['status'])
 
     df = pd.DataFrame.from_dict(data_dict)
 
@@ -153,6 +152,7 @@ def get_driver_id(table):
     selected = selected[0]['DriverId']
     return selected
 
+
 def get_driver_name(table):
     selected = table["selected_rows"]
     selected = selected[0]['Driver']
@@ -176,17 +176,21 @@ def create_drivers_table(df: pd.DataFrame):
         enable_enterprise_modules=True,
         fit_columns_on_grid_load=True,
         gridOptions=options.build(),
-        height=400,
+        height=300,
         theme="streamlit",
         update_mode=GridUpdateMode.MODEL_CHANGED,
         allow_unsafe_jscode=True,
     )
-
     return selection
 
 
 def clear_plot_button():
     with st.sidebar:
-        if st.button('Clear plot'):
-            for key in st.session_state.keys():
-                del st.session_state[key]
+        insert_line(1, True)
+        if st.button('Clear lap times plot'):
+            clear_session_df()
+
+
+def clear_session_df():
+    for key in st.session_state.keys():
+        del st.session_state[key]
