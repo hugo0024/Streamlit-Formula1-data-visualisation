@@ -47,7 +47,7 @@ def get_rounds(select_box):
 
     return races
 
-@st.cache
+
 def get_race_details(year, round_number):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
     response = requests.request("GET", url)
@@ -103,7 +103,7 @@ def insert_empty_space(number, is_sidebar):
         else:
             st.write('')
 
-@st.cache
+
 def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
     response = requests.request("GET", url)
@@ -121,17 +121,16 @@ def get_laps_times(year, round_number, driver_id, driver_name):
 
         df_laps = pd.DataFrame({'Laps': laps_lst})
         df_times = pd.DataFrame({driver_name: times_lst})
-
-        if 'Laps' not in st.session_state.df.columns:
-            st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
-
-        if driver_name not in st.session_state.df.columns:
-            st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
-        else:
-            st.session_state.df.drop(driver_name, axis=1)
-
     else:
         print('No data for this year')
+
+    if 'Laps' not in st.session_state.df.columns:
+        st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
+
+    if driver_name not in st.session_state.df.columns:
+        st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
+    else:
+        st.session_state.df.drop(driver_name, axis=1)
 
 
 def str_time_to_sec(time):

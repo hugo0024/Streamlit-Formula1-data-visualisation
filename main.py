@@ -29,19 +29,13 @@ if __name__ == '__main__':
 
         selected_driver_id = get_driver_id(details_table)
         selected_driver_name = get_driver_name(details_table)
+        print(selected_driver_id)
 
-        try:
-            get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
-            plot_chart()
-        except ValueError:
-            insert_empty_space(7, False)
-            st.markdown("<h1 style='text-align: center; color: grey;'>No lap times data for this race</h1>",
-                        unsafe_allow_html=True)
+        get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
+
+        plot_chart()
 
     else:
         insert_empty_space(7, False)
-        st.markdown("<h1 style='text-align: center; color: grey;'>Select from the table to compare lap times</h1>",
-                    unsafe_allow_html=True)
-        for key in st.session_state.keys():
-            del st.session_state[key]
+        st.markdown("<h1 style='text-align: center; color: grey;'>Select from the table to compare lap times</h1>", unsafe_allow_html=True)
 
