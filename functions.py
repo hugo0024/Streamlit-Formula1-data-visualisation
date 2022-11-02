@@ -5,6 +5,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 import re
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 def add_sidebar_select_box(label, options, index):
@@ -62,15 +63,14 @@ def get_race_details(year, round_number):
     return df
 
 
-def plot_chart(data, selection_status):
-    if selection_status:
-        fig = px.line(data, x="Laps", y="Times")
-        st.plotly_chart(fig, use_container_width=True)
-
-
 def add_line(fig, year, round_number, driver):
     laps_data = get_laps_times(year, round_number, driver)
-    fig.add_scatter(x=laps_data['Laps'], y=laps_data['Times'], name=driver)
+    fig.add_trace(go.Scatter(x=laps_data["Laps"], y=laps_data["Times"], name=driver))
+
+
+def plot_chart(data):
+    fig = px.line(data, x="Laps", y="Times")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 @st.cache
@@ -118,25 +118,6 @@ def get_driver_id(table):
     return selected
 
 
-def ag_grid_interactive_table(df: pd.DataFrame):
-    options = GridOptionsBuilder.from_dataframe(
-        df, enableRowGroup=True, enableValue=True, enablePivot=True
-    )
-
-    options.configure_side_bar()
-
-    options.configure_selection("single")
-    selection = AgGrid(
-        df,
-        enable_enterprise_modules=True,
-        gridOptions=options.build(),
-        update_mode=GridUpdateMode.MODEL_CHANGED,
-        allow_unsafe_jscode=True,
-    )
-
-    return selection
-
-
 def streamlit_setup(title, layout):
     st.set_page_config(page_title=title, layout=layout)
 
@@ -146,9 +127,8 @@ def create_drivers_table(df: pd.DataFrame):
     options.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
 
     options.configure_side_bar()
-    options.configure_selection('multiple')
 
-    options.configure_selection('multiple', use_checkbox=True, groupSelectsChildren=True, groupSelectsFiltered=True)
+    options.configure_selection('single', groupSelectsChildren=True, groupSelectsFiltered=True)
 
     selection = AgGrid(
         df,
