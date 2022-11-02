@@ -103,6 +103,11 @@ def insert_empty_space(number, is_sidebar):
             st.write('')
 
 
+def mark_down_test(test):
+    test = st.markdown(f"<h1 style='text-align: center; color: grey;'>{test}</h1>", unsafe_allow_html=True)
+    return test
+
+
 def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
     response = requests.request("GET", url)
@@ -120,16 +125,20 @@ def get_laps_times(year, round_number, driver_id, driver_name):
 
         df_laps = pd.DataFrame({'Laps': laps_lst})
         df_times = pd.DataFrame({driver_name: times_lst})
-    else:
-        print('No data for this year')
 
-    if 'Laps' not in st.session_state.df.columns:
-        st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
+        if 'Laps' not in st.session_state.df.columns:
+            st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
 
-    if driver_name not in st.session_state.df.columns:
-        st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
+        if driver_name not in st.session_state.df.columns:
+            st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
+        else:
+            st.session_state.df.drop(driver_name, axis=1)
+
+        return True
     else:
-        st.session_state.df.drop(driver_name, axis=1)
+        insert_empty_space(7, False)
+        mark_down_test('No lap times data for this race')
+        return False
 
 
 def str_time_to_sec(time):
@@ -165,10 +174,7 @@ def streamlit_setup(title, layout):
 
 def create_drivers_table(df: pd.DataFrame):
     options = GridOptionsBuilder.from_dataframe(df)
-    options.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
-    options.configure_column('DriverId')
-    options.configure_side_bar()
-
+    options.configure_default_column(groupable=False, value=True, enableRowGroup=True, aggFunc='sum', editable=False)
     options.configure_selection('single', groupSelectsChildren=True, groupSelectsFiltered=True)
 
     selection = AgGrid(
@@ -187,7 +193,7 @@ def create_drivers_table(df: pd.DataFrame):
 def clear_plot_button():
     with st.sidebar:
         insert_line(1, True)
-        if st.button('Clear lap times plot'):
+        if st.button('Clear Plot Lines'):
             clear_session_df()
 
 
