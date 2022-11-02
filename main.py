@@ -18,11 +18,19 @@ if __name__ == '__main__':
 
     selection_status = check_selection_status(details_table)
 
+    with st.sidebar:
+        if st.button('Clear'):
+            for key in st.session_state.keys():
+                del st.session_state[key]
+
     if selection_status:
-        selected_driver_id = get_driver_id(details_table)
 
         create_state_dataframe()
+
+        selected_driver_id = get_driver_id(details_table)
 
         get_laps_times(selected_year, selected_round, selected_driver_id)
 
         plot_chart()
+
+

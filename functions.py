@@ -116,6 +116,7 @@ def get_laps_times(year, round_number, driver_id):
         st.session_state.df.drop(driver_id, axis=1)
 
 
+
 def str_time_to_sec(time):
     m, s, f = re.split('[: .]', time)
     second = int(m) * 60 + int(s) + float(f) * 0.001
@@ -160,3 +161,4 @@ def create_drivers_table(df: pd.DataFrame):
     )
 
     return selection
+
