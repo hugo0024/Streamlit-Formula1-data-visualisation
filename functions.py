@@ -47,13 +47,13 @@ def get_rounds(select_box):
     return races
 
 
-@st.cache
+
 def get_race_details(year, round_number):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
     response = requests.request("GET", url)
     data = response.json()
 
-    data_dict = {'Pos': [], 'No': [], 'Driver': [], 'Constructor': [], 'Laps': [], 'Grid': [], 'Status': [],
+    data_dict = {'Pos': [], 'No': [], 'Driver': [], 'Constructor': [], 'Laps': [], 'Grid': [], 'Status': [], 'Time': [],
                  'Points': [], 'DriverId': []}
 
     for dataItem in data['MRData']['RaceTable']['Races'][0]['Results']:
@@ -66,14 +66,14 @@ def get_race_details(year, round_number):
         data_dict['Status'].append(dataItem['status'])
         data_dict['Points'].append(dataItem['points'])
         data_dict['DriverId'].append(dataItem['Driver']['driverId'])
+        try:
+            data_dict['Time'].append(dataItem['Time']['time'])
+        except KeyError:
+            data_dict['Time'].append(None)
 
     df = pd.DataFrame.from_dict(data_dict)
+
     return df
-
-
-def add_line(fig, year, round_number, driver):
-    laps_data = get_laps_times(year, round_number, driver)
-    fig.add_trace(go.Scatter(x=laps_data["Laps"], y=laps_data["Times"], name=driver))
 
 
 def plot_chart():
@@ -86,7 +86,6 @@ def create_state_dataframe():
         st.session_state.df = pd.DataFrame({})
 
 
-@st.cache
 def get_laps_times(year, round_number, driver_id):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
     response = requests.request("GET", url)
@@ -114,7 +113,6 @@ def get_laps_times(year, round_number, driver_id):
         st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
     else:
         st.session_state.df.drop(driver_id, axis=1)
-
 
 
 def str_time_to_sec(time):
@@ -145,7 +143,7 @@ def streamlit_setup(title, layout):
 def create_drivers_table(df: pd.DataFrame):
     options = GridOptionsBuilder.from_dataframe(df)
     options.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
-
+    options.configure_column('DriverId')
     options.configure_side_bar()
 
     options.configure_selection('multiple', groupSelectsChildren=True, groupSelectsFiltered=True)
@@ -155,6 +153,7 @@ def create_drivers_table(df: pd.DataFrame):
         enable_enterprise_modules=True,
         fit_columns_on_grid_load=True,
         gridOptions=options.build(),
+        height=400,
         theme="streamlit",
         update_mode=GridUpdateMode.MODEL_CHANGED,
         allow_unsafe_jscode=True,
@@ -162,3 +161,8 @@ def create_drivers_table(df: pd.DataFrame):
 
     return selection
 
+def clear_plot_button():
+    with st.sidebar:
+        if st.button('Clear'):
+            for key in st.session_state.keys():
+                del st.session_state[key]

@@ -16,12 +16,10 @@ if __name__ == '__main__':
 
     details_table = create_drivers_table(df=df_race)
 
-    selection_status = check_selection_status(details_table)
+    clear_plot_button()
 
-    with st.sidebar:
-        if st.button('Clear'):
-            for key in st.session_state.keys():
-                del st.session_state[key]
+
+    selection_status = check_selection_status(details_table)
 
     if selection_status:
 
@@ -32,5 +30,6 @@ if __name__ == '__main__':
         get_laps_times(selected_year, selected_round, selected_driver_id)
 
         plot_chart()
+
 
 
