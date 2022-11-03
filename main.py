@@ -29,7 +29,6 @@ if __name__ == '__main__':
 
         selected_driver_id = get_driver_id(details_table)
         selected_driver_name = get_driver_name(details_table)
-        print(selected_driver_id)
 
         lap_times = get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
 

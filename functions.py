@@ -174,7 +174,8 @@ def streamlit_setup(title, layout):
 
 def create_drivers_table(df: pd.DataFrame):
     options = GridOptionsBuilder.from_dataframe(df)
-    options.configure_default_column(groupable=False, value=True, enableRowGroup=True, aggFunc='sum', editable=False)
+    options.configure_default_column(groupable=False, value=True, enableRowGroup=False, aggFunc='sum', editable=False,
+                                     sorteable=False)
     options.configure_selection('single', groupSelectsChildren=True, groupSelectsFiltered=True)
 
     selection = AgGrid(
