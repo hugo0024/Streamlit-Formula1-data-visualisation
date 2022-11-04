@@ -2,7 +2,6 @@ from functions import *
 
 
 def create_championships_page():
-
     selected = create_championships_options()
     seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
     fit_check_box = fit_table_check_box()
@@ -34,6 +33,7 @@ def create_championships_radio_btn():
     return championships
 
 
+@st.cache
 def get_driver_championships(year):
     url = f'https://ergast.com/api/f1/{year}/driverStandings.json'
     response = requests.request("GET", url)
@@ -53,6 +53,7 @@ def get_driver_championships(year):
     return df
 
 
+@st.cache
 def get_constructor_championships(year):
     url = f'https://ergast.com/api/f1/{year}/constructorStandings.json'
     response = requests.request("GET", url)
