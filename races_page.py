@@ -3,10 +3,10 @@ import os
 
 
 def create_races_page():
-    seasons = add_sidebar_select_box('Please choose a season', get_seasons(), 0)
+    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
     rounds = get_rounds(seasons)
     insert_line(1, True)
-    rounds = st.sidebar.selectbox("Please choose a race", range(len(rounds)), 0, format_func=lambda x: rounds[x])
+    rounds = st.sidebar.selectbox("Races:", range(len(rounds)), 0, format_func=lambda x: rounds[x])
     fit_check_box = fit_table_check_box()
 
     selected_year = seasons

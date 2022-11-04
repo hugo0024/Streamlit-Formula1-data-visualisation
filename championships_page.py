@@ -1,20 +1,28 @@
-import stack_data.utils
-
 from functions import *
 
 
 def create_championships_page():
-    championships = create_championships_radio_btn()
-    seasons = add_sidebar_select_box('Please choose a season', get_seasons(), 0)
+
+    selected = create_championships_options()
+    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
     fit_check_box = fit_table_check_box()
 
-    if championships == 'Driver Championships':
+    if selected == 'Drivers':
         drivers_championships_df = get_driver_championships(seasons)
         create_table(drivers_championships_df, fit_check_box)
 
-    if championships == 'Constructor Championships':
+    if selected == 'Constructors':
         constructor_championships_df = get_constructor_championships(seasons)
         create_table(constructor_championships_df, fit_check_box)
+
+
+def create_championships_options():
+    with st.sidebar:
+        selected = option_menu(
+            menu_title=None,
+            options=['Drivers', 'Constructors'],
+            icons=['people', 'building'])
+    return selected
 
 
 def create_championships_radio_btn():
