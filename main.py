@@ -1,41 +1,17 @@
+from races_page import create_races_page
 from functions import *
 
 if __name__ == '__main__':
     streamlit_setup('F1 data Visualiser', 'wide')
 
+    selected = create_nav_menu()
+
     lottie = load_lottie()
     insert_line(1, True)
-    seasons = add_sidebar_select_box('Please choose a season', get_seasons(), 0)
-    rounds = get_rounds(seasons)
-    insert_line(1, True)
-    rounds = st.sidebar.selectbox("Please choose a race", range(len(rounds)), 0, format_func=lambda x: rounds[x])
 
-    selected_year = seasons
-    selected_round = rounds + 1
-
-    df_race = get_race_details(selected_year, selected_round)
-
-    details_table = create_drivers_table(df=df_race)
-
-    selection_status = check_selection_status(details_table)
-
-    if selection_status:
-
-        insert_line(1, False)
-
-        clear_plot_button()
-
-        create_state_dataframe()
-
-        selected_driver_id = get_driver_id(details_table)
-        selected_driver_name = get_driver_name(details_table)
-
-        lap_times = get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
-
-        if lap_times:
-            plot_chart()
-
-    else:
-        insert_empty_space(7, False)
-        mark_down_test('Select from the table to compare lap times')
-        clear_session_df()
+    if selected == 'Races':
+        create_races_page()
+    if selected == 'Championships':
+        st.write('Championships')
+    if selected == 'Maps':
+        st.write('Maps')

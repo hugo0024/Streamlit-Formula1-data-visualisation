@@ -7,6 +7,16 @@ import plotly.express as px
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 from streamlit_lottie import st_lottie
+from streamlit_option_menu import option_menu
+
+
+def create_nav_menu():
+    selected = option_menu(
+        menu_title=None,
+        options=['Races', 'Championships', 'Maps'],
+        icons=['card-heading', 'calendar3', 'map'],
+        orientation='horizontal')
+    return selected
 
 
 def add_sidebar_select_box(label, options, index):
@@ -24,7 +34,7 @@ def load_lottie():
 @st.cache
 def get_seasons():
     seasons = []
-    url = "https://ergast.com/api/f1/seasons.json?limit=1000"
+    url = "http://ergast.com/api/f1/seasons.json?limit=1000"
     response = requests.request("GET", url)
     data = response.json()
     for data_item in data['MRData']['SeasonTable']['Seasons']:
@@ -172,7 +182,7 @@ def streamlit_setup(title, layout):
     st.set_page_config(page_title=title, layout=layout)
 
 
-def create_drivers_table(df: pd.DataFrame):
+def create_drivers_table(df, fit_columns):
     options = GridOptionsBuilder.from_dataframe(df)
     options.configure_default_column(groupable=False, value=True, enableRowGroup=False, aggFunc='sum', editable=False,
                                      sorteable=False)
@@ -181,10 +191,9 @@ def create_drivers_table(df: pd.DataFrame):
     selection = AgGrid(
         df,
         enable_enterprise_modules=True,
-        fit_columns_on_grid_load=True,
         gridOptions=options.build(),
         height=300,
-        theme="streamlit",
+        fit_columns_on_grid_load=fit_columns,
         update_mode=GridUpdateMode.MODEL_CHANGED,
         allow_unsafe_jscode=True,
     )
@@ -201,3 +210,10 @@ def clear_plot_button():
 def clear_session_df():
     for key in st.session_state.keys():
         del st.session_state[key]
+
+
+def fit_table_check_box():
+    with st.sidebar:
+        insert_line(1, False)
+        fit_columns_on_grid_load = st.sidebar.checkbox("Fit table columns on page", value=True)
+        return fit_columns_on_grid_load
