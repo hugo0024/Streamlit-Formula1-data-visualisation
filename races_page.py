@@ -1,5 +1,4 @@
 from functions import *
-import os
 
 
 def create_races_page():
@@ -38,7 +37,7 @@ def create_races_page():
         clear_session_df()
 
 
-@st.cache
+@st.cache(persist=True)
 def get_race_details(year, round_number):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
     response = requests.request("GET", url)

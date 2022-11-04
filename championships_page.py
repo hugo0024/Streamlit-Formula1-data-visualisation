@@ -33,7 +33,7 @@ def create_championships_radio_btn():
     return championships
 
 
-@st.cache
+@st.cache(persist=True)
 def get_driver_championships(year):
     url = f'https://ergast.com/api/f1/{year}/driverStandings.json'
     response = requests.request("GET", url)
@@ -53,7 +53,7 @@ def get_driver_championships(year):
     return df
 
 
-@st.cache
+@st.cache(persist=True)
 def get_constructor_championships(year):
     url = f'https://ergast.com/api/f1/{year}/constructorStandings.json'
     response = requests.request("GET", url)

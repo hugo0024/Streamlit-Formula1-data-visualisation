@@ -13,10 +13,20 @@ from streamlit_option_menu import option_menu
 def create_nav_menu():
     selected = option_menu(
         menu_title=None,
-        options=['Races', 'Championships', 'Maps'],
+        options=['Races', 'Championships', 'Circuits'],
         icons=['card-heading', 'calendar3', 'map'],
         orientation='horizontal')
     return selected
+
+
+def light_dark_mode_option():
+    with st.sidebar:
+        mode = option_menu(
+            menu_title=None,
+            options=['Light', 'Dark'],
+            icons=['lightbulb', 'lightbulb-off-fill'],
+            orientation='horizontal')
+    return mode
 
 
 def add_sidebar_select_box(label, options, index):
@@ -31,7 +41,7 @@ def load_lottie():
         st_lottie(lottie, height=100, key='car')
 
 
-@st.cache
+@st.cache(persist=True)
 def get_seasons():
     seasons = []
     url = "http://ergast.com/api/f1/seasons.json?limit=1000"
@@ -43,7 +53,7 @@ def get_seasons():
     return seasons
 
 
-@st.cache
+@st.cache(persist=True)
 def get_rounds(select_box):
     year = select_box
     url = f'https://ergast.com/api/f1/{year}/results.json?limit=10000'
@@ -61,6 +71,7 @@ def plot_chart(df, x, y, x_label, y_label):
     fig = px.line(df, x=x, y=y).update_layout(xaxis_title=x_label, yaxis_title=y_label)
     st.plotly_chart(fig, use_container_width=True)
     return fig
+
 
 def create_state_dataframe():
     if "df" not in st.session_state:
