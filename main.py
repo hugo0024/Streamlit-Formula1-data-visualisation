@@ -2,7 +2,6 @@ from races_page import create_races_page
 from championships_page import create_championships_page
 from maps_page import create_map_page
 from functions import *
-import toml
 
 if __name__ == '__main__':
     streamlit_setup('F1 data Visualiser', 'wide')
