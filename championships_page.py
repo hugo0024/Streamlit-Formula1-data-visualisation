@@ -9,10 +9,12 @@ def create_championships_page():
     if selected == 'Drivers':
         drivers_championships_df = get_driver_championships(seasons)
         create_table(drivers_championships_df, fit_check_box)
+        create_bar_chart(seasons, 'Drivers')
 
     if selected == 'Constructors':
         constructor_championships_df = get_constructor_championships(seasons)
         create_table(constructor_championships_df, fit_check_box)
+        create_bar_chart(seasons, 'Constructors')
 
 
 def create_championships_options():
@@ -36,8 +38,7 @@ def create_championships_radio_btn():
 @st.cache(persist=True)
 def get_driver_championships(year):
     url = f'https://ergast.com/api/f1/{year}/driverStandings.json'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
 
     data_dict = {'Standing': [], 'Driver': [], 'Constructor': [], 'Points': [], 'Wins': []}
 
@@ -56,8 +57,7 @@ def get_driver_championships(year):
 @st.cache(persist=True)
 def get_constructor_championships(year):
     url = f'https://ergast.com/api/f1/{year}/constructorStandings.json'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
 
     data_dict = {'Standing': [], 'Constructor': [], 'Nationality': [], 'Points': [], 'Wins': []}
 
@@ -71,3 +71,19 @@ def get_constructor_championships(year):
     df = pd.DataFrame.from_dict(data_dict)
 
     return df
+
+
+def create_bar_chart(year, championships):
+    if championships == 'Drivers':
+        df = get_driver_championships(year)
+        df = df.astype({'Points': 'float'})
+        fig = px.bar(df, x='Driver', y='Points', color="Driver", text_auto=True)
+        fig.update_traces(showlegend=False)
+        st.plotly_chart(fig, use_container_width=True)
+
+    if championships == 'Constructors':
+        df = get_constructor_championships(year)
+        df = df.astype({'Points': 'float'})
+        fig = px.bar(df, x='Constructor', y='Points', color="Constructor", text_auto=True)
+        fig.update_traces(showlegend=False)
+        st.plotly_chart(fig, use_container_width=True)

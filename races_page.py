@@ -40,8 +40,7 @@ def create_races_page():
 @st.cache(persist=True)
 def get_race_details(year, round_number):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
 
     data_dict = {'Pos': [], 'No': [], 'Driver': [], 'Constructor': [], 'Laps': [], 'Grid': [], 'Status': [], 'Time': [],
                  'Points': [], 'DriverId': []}
@@ -69,8 +68,7 @@ def get_race_details(year, round_number):
 
 def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
     if data['MRData']['total'] != '0':
         laps_lst = []
         times_lst = []
@@ -103,7 +101,6 @@ def get_laps_times(year, round_number, driver_id, driver_name):
 def str_time_to_sec(time):
     m, s, f = re.split('[: .]', time)
     second = int(m) * 60 + int(s) + float(f) * 0.001
-
     return second
 
 

@@ -14,8 +14,7 @@ def create_map_page():
 @st.cache(persist=True)
 def get_circuits_details(year):
     url = f'https://ergast.com/api/f1/{year}/circuits.json?limit=10000'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
 
     data_dict = {'Circuit': [], 'Location': [], 'Country': []}
 
@@ -32,8 +31,7 @@ def get_circuits_details(year):
 @st.cache(persist=True)
 def get_circuits_location(year):
     url = f'https://ergast.com/api/f1/{year}/circuits.json?limit=10000'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
 
     data_dict = {'lat': [], 'lon': []}
 

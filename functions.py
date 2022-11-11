@@ -8,6 +8,8 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 from streamlit_lottie import st_lottie
 from streamlit_option_menu import option_menu
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 def create_nav_menu():
@@ -29,6 +31,17 @@ def light_dark_mode_option():
     return mode
 
 
+def make_request(url):
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=2)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    response = session.get(url)
+    data = response.json()
+    return data
+
+
 def add_sidebar_select_box(label, options, index):
     select_box = st.sidebar.selectbox(label, options, index)
     return select_box
@@ -45,8 +58,7 @@ def load_lottie():
 def get_seasons():
     seasons = []
     url = "http://ergast.com/api/f1/seasons.json?limit=1000"
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
     for data_item in data['MRData']['SeasonTable']['Seasons']:
         seasons.append(data_item['season'])
     seasons.reverse()
@@ -57,8 +69,7 @@ def get_seasons():
 def get_rounds(select_box):
     year = select_box
     url = f'https://ergast.com/api/f1/{year}/results.json?limit=10000'
-    response = requests.request("GET", url)
-    data = response.json()
+    data = make_request(url)
     races = []
 
     for dataItem in data['MRData']['RaceTable']['Races']:
