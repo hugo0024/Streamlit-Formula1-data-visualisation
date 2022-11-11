@@ -49,13 +49,14 @@ def get_race_details(year, round_number):
     for dataItem in data['MRData']['RaceTable']['Races'][0]['Results']:
         data_dict['Pos'].append(dataItem['position'])
         data_dict['No'].append(dataItem['number'])
-        data_dict['Driver'].append(dataItem['Driver']['familyName'])
+        data_dict['Driver'].append(dataItem['Driver']['givenName'] + ' ' + dataItem['Driver']['familyName'])
         data_dict['Constructor'].append(dataItem['Constructor']['name'])
         data_dict['Laps'].append(dataItem['laps'])
         data_dict['Grid'].append(dataItem['grid'])
         data_dict['Status'].append(dataItem['status'])
         data_dict['Points'].append(dataItem['points'])
         data_dict['DriverId'].append(dataItem['Driver']['driverId'])
+
         try:
             data_dict['Time'].append(dataItem['Time']['time'])
         except KeyError:

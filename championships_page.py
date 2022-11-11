@@ -43,7 +43,7 @@ def get_driver_championships(year):
 
     for dataItem in data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']:
         data_dict['Standing'].append(dataItem['position'])
-        data_dict['Driver'].append(dataItem['Driver']['familyName'])
+        data_dict['Driver'].append(dataItem['Driver']['givenName'] + ' ' + dataItem['Driver']['familyName'])
         data_dict['Constructor'].append(dataItem['Constructors'][0]['name'])
         data_dict['Points'].append(dataItem['points'])
         data_dict['Wins'].append(dataItem['wins'])
