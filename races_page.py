@@ -1,6 +1,7 @@
 from functions import *
 
 
+# Main function for the races page
 def create_races_page():
     seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
     rounds = get_rounds(seasons)
@@ -29,11 +30,11 @@ def create_races_page():
         lap_times = get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
 
         if lap_times:
-            plot = plot_chart(st.session_state.df, 'Laps', st.session_state.df.columns, 'Laps', 'Seconds')
+            plot_chart(st.session_state.df, 'Laps', st.session_state.df.columns, 'Laps', 'Seconds')
 
     else:
         insert_empty_space(7, False)
-        mark_down_test('Select from the table to compare lap times')
+        add_mark_down_text('Select from the table to compare lap times')
         clear_session_df()
 
 
@@ -94,7 +95,7 @@ def get_laps_times(year, round_number, driver_id, driver_name):
         return True
     else:
         insert_empty_space(7, False)
-        mark_down_test('No lap times data for this race')
+        add_mark_down_text('No lap times data for this race')
         return False
 
 
