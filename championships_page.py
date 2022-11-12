@@ -1,47 +1,44 @@
 from functions import *
 
 
+# Main function for the championships page
 def create_championships_page():
-    selected = create_championships_options()
-    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
-    fit_check_box = fit_table_check_box()
+    selected = create_championships_options()  # create the nav menu for the drivers and constructors page
+    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)  # create a select box to store all the seasons
+    fit_check_box = fit_table_check_box()  # create the fit tabel columns on grid check box
 
-    if selected == 'Drivers':
-        drivers_championships_df = get_driver_championships(seasons)
-        create_table(drivers_championships_df, fit_check_box)
-        create_bar_chart(seasons, 'Drivers')
+    if selected == 'Drivers':  # if selected drivers from the nav menu
+        drivers_championships_df = get_driver_championships(seasons)  # get data and create a df
+        create_table(drivers_championships_df, fit_check_box)  # create the table
+        create_bar_chart(seasons, 'Drivers')  # plot the bar chart using the df
 
-    if selected == 'Constructors':
+    if selected == 'Constructors':  # if selected constructors from the nav menu
         constructor_championships_df = get_constructor_championships(seasons)
         create_table(constructor_championships_df, fit_check_box)
         create_bar_chart(seasons, 'Constructors')
 
 
+# Function to creat the nav menu for the drivers and constructors' championship
 def create_championships_options():
-    with st.sidebar:
+    with st.sidebar:  # add the nav menu to sidebar
         selected = option_menu(
             menu_title=None,
             options=['Drivers', 'Constructors'],
             icons=['people', 'building'])
-    return selected
+    return selected  # return the selected item
 
 
-def create_championships_radio_btn():
-    with st.sidebar:
-        championships = st.radio(
-            'Select:', ('Driver Championships', 'Constructor Championships')
-        )
-    insert_line(1, True)
-    return championships
-
-
+# Function to get the data from the driver championships in a specific year
+# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_driver_championships(year):
-    url = f'https://ergast.com/api/f1/{year}/driverStandings.json'
-    data = make_request(url)
+    url = f'https://ergast.com/api/f1/{year}/driverStandings.json'  # url to make request from
+    data = make_request(url)  # get the json object from request
 
+    # dictionary to append to
     data_dict = {'Standing': [], 'Driver': [], 'Constructor': [], 'Points': [], 'Wins': []}
 
+    # append corresponding data to the dictionary
     for dataItem in data['MRData']['StandingsTable']['StandingsLists'][0]['DriverStandings']:
         data_dict['Standing'].append(dataItem['position'])
         data_dict['Driver'].append(dataItem['Driver']['givenName'] + ' ' + dataItem['Driver']['familyName'])
@@ -49,11 +46,13 @@ def get_driver_championships(year):
         data_dict['Points'].append(dataItem['points'])
         data_dict['Wins'].append(dataItem['wins'])
 
-    df = pd.DataFrame.from_dict(data_dict)
+    df = pd.DataFrame.from_dict(data_dict)  # create a pandas dataframe from the dictionary
 
-    return df
+    return df  # return the dataframe
 
 
+# Function to get the data from the constructor championships in a specific year
+# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_constructor_championships(year):
     url = f'https://ergast.com/api/f1/{year}/constructorStandings.json'
@@ -73,6 +72,7 @@ def get_constructor_championships(year):
     return df
 
 
+# Function to create bar chart for the Drivers and Constructors' championship
 def create_bar_chart(year, championships):
     if championships == 'Drivers':
         df = get_driver_championships(year)
