@@ -1,6 +1,6 @@
 from races_page import create_races_page
 from championships_page import create_championships_page
-from maps_page import create_map_page
+from circuits_page import create_circuits_page
 from functions import *
 
 #
@@ -17,4 +17,4 @@ if __name__ == '__main__':
     if selected == 'Championships':
         create_championships_page()
     if selected == 'Circuits':
-        create_map_page()
+        create_circuits_page()
