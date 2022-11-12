@@ -78,6 +78,10 @@ def get_race_details(year, round_number):
 
 
 # Function to get the lap times for a driver in a race
+# Session state is needed in this function because variables will be reset between reruns
+# In this case the user will need to compare laps times data for different drivers by selecting them individually
+# By using the session state dataframe, the dataframe will not get reset when the user select another driver
+# Therefore, displaying lap times data for multiple drivers in a plot will be possible
 def get_laps_times(year, round_number, driver_id, driver_name):
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'  # url to make request from
     data = make_request(url)
