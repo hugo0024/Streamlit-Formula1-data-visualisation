@@ -40,18 +40,21 @@ def create_races_page():
         insert_empty_space(7, False)
         add_mark_down_text('Select from the table to compare lap times')
         # clear the session dataframe because the table is unselected, meaning the user has selected a different
-        # season or round
+        # season or round or to a different page
         clear_session_df()
 
 
+# Function to get the race details for a specific race, enabled streamlit caching to cache this function
 @st.cache(persist=True)
 def get_race_details(year, round_number):
-    url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'
-    data = make_request(url)
+    url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'  # url to make request from
+    data = make_request(url)  # making request and store the json object
 
+    # Empty dictionary to store all the data
     data_dict = {'Pos': [], 'No': [], 'Driver': [], 'Constructor': [], 'Laps': [], 'Grid': [], 'Status': [], 'Time': [],
                  'Points': [], 'DriverId': []}
 
+    # append corresponding data from the json object to the dictionary
     for dataItem in data['MRData']['RaceTable']['Races'][0]['Results']:
         data_dict['Pos'].append(dataItem['position'])
         data_dict['No'].append(dataItem['number'])
@@ -63,60 +66,69 @@ def get_race_details(year, round_number):
         data_dict['Points'].append(dataItem['points'])
         data_dict['DriverId'].append(dataItem['Driver']['driverId'])
 
+        # data for time can be empty in the json object, because some driver may not finish the race
+        # using a try and except to catch key error
         try:
             data_dict['Time'].append(dataItem['Time']['time'])
         except KeyError:
             data_dict['Time'].append(dataItem['status'])
 
-    df = pd.DataFrame.from_dict(data_dict)
-
+    df = pd.DataFrame.from_dict(data_dict)  # create a pandas dataframe from the dictionary and return it
     return df
 
 
+# Function to get the lap times for a driver in a race
 def get_laps_times(year, round_number, driver_id, driver_name):
-    url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'
+    url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'  # url to make request from
     data = make_request(url)
-    if data['MRData']['total'] != '0':
+    if data['MRData']['total'] != '0':  # check if the json object have any lap times data
         laps_lst = []
         times_lst = []
         for dataItem in data['MRData']['RaceTable']['Races'][0]['Laps']:
-            laps_lst.append(dataItem['number'])
+            laps_lst.append(dataItem['number'])     # append all the laps number to the laps list
             for x in range(len(dataItem['Timings'])):
-                if dataItem['Timings'][x]['driverId'] == driver_id:
-                    time = dataItem['Timings'][x]["time"]
-                    time = str_time_to_sec(time)
-                    times_lst.append(time)
+                if dataItem['Timings'][x]['driverId'] == driver_id:  # filter the data for the correct driver
+                    time = dataItem['Timings'][x]["time"]            # get the lap times for the driver
+                    time = str_time_to_sec(time)                # convert from str minutes and seconds to float seconds
+                    times_lst.append(time)                      # append the time to the time list
 
-        df_laps = pd.DataFrame({'Laps': laps_lst})
+        df_laps = pd.DataFrame({'Laps': laps_lst})          # create dataframes from the lists
         df_times = pd.DataFrame({driver_name: times_lst})
 
+        # if there is no laps column in the session dataframe
         if 'Laps' not in st.session_state.df.columns:
+            # add the laps dataframe to the session dataframe
             st.session_state.df = pd.concat([st.session_state.df, df_laps], axis=1)
 
+        # check if the driver has been already added to the session dataframe
         if driver_name not in st.session_state.df.columns:
+            # add the time dataframe to the session dataframe
             st.session_state.df = pd.concat([st.session_state.df, df_times], axis=1)
         else:
             st.session_state.df.drop(driver_name, axis=1)
 
-        return True
+        return True  # return turn for getting the lap times successfully
     else:
         insert_empty_space(7, False)
         add_mark_down_text('No lap times data for this race')
-        return False
+        return False  # return false because there is no lap times data in the json object
 
 
+# Function to convert str minutes and seconds to float second
 def str_time_to_sec(time):
     m, s, f = re.split('[: .]', time)
     second = int(m) * 60 + int(s) + float(f) * 0.001
     return second
 
 
+# Function to get the selected driver id in the table
 def get_driver_id(table):
     selected = table["selected_rows"]
     selected = selected[0]['DriverId']
     return selected
 
 
+# Function to get the selected driver name in the table
 def get_driver_name(table):
     selected = table["selected_rows"]
     selected = selected[0]['Driver']
