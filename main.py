@@ -7,7 +7,7 @@ from functions import *
 if __name__ == '__main__':
 
     # Initialize streamlit by calling various functions
-    # See each functions for detailed explanation
+    # See each functions for detailed explanations
     streamlit_setup('F1 data Visualiser', 'wide')
     selected = create_nav_menu()
 

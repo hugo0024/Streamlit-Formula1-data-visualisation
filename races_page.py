@@ -1,40 +1,46 @@
 from functions import *
 
 
-# Main function for the races page
+# Main function to create the races page
+# See each functions for detailed explanations
 def create_races_page():
-    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)
-    rounds = get_rounds(seasons)
+    seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)  # add a select box to store all the seasons
+    rounds = get_rounds(seasons)  # get all the rounds from a season
     insert_line(1, True)
+    # load all the rounds into a select box and getting the index value for each item using streamlit format_func
     rounds = st.sidebar.selectbox("Races:", range(len(rounds)), 0, format_func=lambda x: rounds[x])
-    fit_check_box = fit_table_check_box()
+    fit_check_box = fit_table_check_box()  # create the fit column on gird check box
 
+    # get the selected season from the season select box
     selected_year = seasons
+    # get the selected round number, adding 1 to it because the index value starts with 0 but round number start from 1
     selected_round = rounds + 1
 
-    df_race = get_race_details(selected_year, selected_round)
+    df_race = get_race_details(selected_year, selected_round)  # get the race details dataframe for the selected round
+    details_table = create_table(df_race, fit_check_box)  # create the table
 
-    details_table = create_table(df_race, fit_check_box)
+    selection_status = check_selection_status(details_table)  # check is the table selected or not
 
-    selection_status = check_selection_status(details_table)
+    if selection_status:  # if the table is selected
 
-    if selection_status:
+        clear_plot_button()  # create and show the clear plot line button
 
-        clear_plot_button()
+        create_state_dataframe()  # create the state dataframe
 
-        create_state_dataframe()
+        selected_driver_id = get_driver_id(details_table)  # get the selected driver id from the table
+        selected_driver_name = get_driver_name(details_table)  # get the selected driver name from the table
 
-        selected_driver_id = get_driver_id(details_table)
-        selected_driver_name = get_driver_name(details_table)
-
+        # get the lap times for the selected driver
         lap_times = get_laps_times(selected_year, selected_round, selected_driver_id, selected_driver_name)
 
-        if lap_times:
+        if lap_times:  # if there are lap times data to show
             plot_chart(st.session_state.df, 'Laps', st.session_state.df.columns, 'Laps', 'Seconds')
 
     else:
         insert_empty_space(7, False)
         add_mark_down_text('Select from the table to compare lap times')
+        # clear the session dataframe because the table is unselected, meaning the user has selected a different
+        # season or round
         clear_session_df()
 
 
