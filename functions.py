@@ -54,7 +54,7 @@ def load_lottie():
 @st.cache(persist=True)
 def get_seasons():
     seasons = []  # Empty list to append to
-    url = "http://ergast.com/api/f1/seasons.json?limit=1000"
+    url = "https://ergast.com/api/f1/seasons.json?limit=1000"
     data = make_request(url)  # making request from the url
     for data_item in data['MRData']['SeasonTable']['Seasons']:  # Append each season to the list
         seasons.append(data_item['season'])
@@ -63,7 +63,7 @@ def get_seasons():
 
 
 # Function to get all the rounds from a specific season.
-@st.cache(persist=True)
+@st.cache()
 def get_rounds(select_box):
     year = select_box
     url = f'https://ergast.com/api/f1/{year}/results.json?limit=10000'
