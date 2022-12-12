@@ -1,8 +1,17 @@
-from functions import *
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+from functions import add_sidebar_select_box
+from functions import get_seasons
+from functions import fit_table_check_box
+from functions import create_table
+from functions import make_request
+from functions import option_menu
 
 
-# Main function for the championships page
 def create_championships_page():
+    """Main function for the championships page"""
+
     selected = create_championships_options()  # create the nav menu for the drivers and constructors page
     seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)  # create a select box to store all the seasons
     fit_check_box = fit_table_check_box()  # create the fit tabel columns on grid check box
@@ -18,8 +27,9 @@ def create_championships_page():
         create_bar_chart(seasons, 'Constructors')
 
 
-# Function to creat the nav menu for the drivers and constructors' championship
 def create_championships_options():
+    """Function to creat the nav menu for the drivers and constructors' championship"""
+
     with st.sidebar:  # add the nav menu to sidebar
         selected = option_menu(
             menu_title=None,
@@ -28,10 +38,13 @@ def create_championships_options():
     return selected  # return the selected item
 
 
-# Function to get the data from the driver championships in a specific year
-# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_driver_championships(year):
+    """
+    Function to get the data from the driver championships in a specific year
+    Cache this function to save time between reruns
+    """
+
     url = f'https://ergast.com/api/f1/{year}/driverStandings.json'  # url to make request from
     data = make_request(url)  # get the json object from request
 
@@ -51,10 +64,13 @@ def get_driver_championships(year):
     return df  # return the dataframe
 
 
-# Function to get the data from the constructor championships in a specific year
-# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_constructor_championships(year):
+    """
+    Function to get the data from the constructor championships in a specific year
+    Cache this function to save time between reruns
+    """
+
     url = f'https://ergast.com/api/f1/{year}/constructorStandings.json'
     data = make_request(url)
 
@@ -72,8 +88,9 @@ def get_constructor_championships(year):
     return df
 
 
-# Function to create bar chart for the Drivers and Constructors' championship
 def create_bar_chart(year, championships):
+    """Function to create bar chart for the Drivers and Constructors' championship"""
+
     if championships == 'Drivers':
         df = get_driver_championships(year)
         df = df.astype({'Points': 'float'})

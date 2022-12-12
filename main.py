@@ -1,7 +1,8 @@
 from races_page import create_races_page
 from championships_page import create_championships_page
 from circuits_page import create_circuits_page
-from functions import *
+from functions import streamlit_setup
+from functions import create_nav_menu
 
 #
 if __name__ == '__main__':

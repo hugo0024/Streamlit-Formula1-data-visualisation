@@ -1,8 +1,15 @@
-from functions import *
+import pandas as pd
+import streamlit as st
+from functions import add_sidebar_select_box
+from functions import get_seasons
+from functions import fit_table_check_box
+from functions import create_table
+from functions import make_request
 
 
-# Main function for the circuits page
 def create_circuits_page():
+    """Main function for the circuits page"""
+
     seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)  # create a select box to store all the seasons
     fit_check_box = fit_table_check_box()  # create the fit tabel columns on grid check box
     circuits_details_df = get_circuits_details(seasons)  # get and create the dataframe for the circuits data
@@ -12,10 +19,13 @@ def create_circuits_page():
     st.map(data=location_df, zoom=1, use_container_width=True)  # display the map containing all the circuits location
 
 
-# Function to get the data for the circuits in a specific year
-# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_circuits_details(year):
+    """
+    Function to get the data for the circuits in a specific year
+    Cache this function to save time between reruns
+    """
+
     url = f'https://ergast.com/api/f1/{year}/circuits.json?limit=10000'  # url to make request from
     data = make_request(url)  # get the json object from request
 
@@ -32,10 +42,13 @@ def get_circuits_details(year):
     return df  # return the dataframe
 
 
-# Function to get the data for the circuits location in a specific year
-# Cache this function to save time between reruns
 @st.cache(persist=True)
 def get_circuits_location(year):
+    """
+    Function to get the data for the circuits location in a specific year
+    Cache this function to save time between reruns
+    """
+
     url = f'https://ergast.com/api/f1/{year}/circuits.json?limit=10000'
     data = make_request(url)
 

@@ -1,9 +1,28 @@
-from functions import *
+import streamlit as st
+import pandas as pd
+import re
+from functions import add_sidebar_select_box
+from functions import get_seasons
+from functions import get_rounds
+from functions import insert_line
+from functions import fit_table_check_box
+from functions import create_table
+from functions import check_selection_status
+from functions import clear_plot_button
+from functions import create_state_dataframe
+from functions import plot_chart
+from functions import insert_empty_space
+from functions import add_mark_down_text
+from functions import clear_session_df
+from functions import make_request
 
 
-# Main function to create the races page
-# See each functions for detailed explanations
 def create_races_page():
+    """
+    Main function to create the races page
+    See each functions for detailed explanations
+    """
+
     seasons = add_sidebar_select_box('Seasons:', get_seasons(), 0)  # add a select box to store all the seasons
     rounds = get_rounds(seasons)  # get all the rounds from a season
     insert_line(1, True)
@@ -44,9 +63,10 @@ def create_races_page():
         clear_session_df()
 
 
-# Function to get the race details for a specific race, enabled streamlit caching to cache this function
 @st.cache(persist=True)
 def get_race_details(year, round_number):
+    """Function to get the race details for a specific race, enabled streamlit caching to cache this function"""
+
     url = f'https://ergast.com/api/f1/{year}/{round_number}/results.json?limit=10000'  # url to make request from
     data = make_request(url)  # making request and store the json object
 
@@ -77,26 +97,29 @@ def get_race_details(year, round_number):
     return df
 
 
-# Function to get the lap times for a driver in a race
-# Session state is needed in this function because variables will be reset between reruns
-# In this case the user will need to compare laps times data for different drivers by selecting them individually
-# By using the session state dataframe, the dataframe will not get reset when the user select another driver
-# Therefore, displaying lap times data for multiple drivers in a plot will be possible
 def get_laps_times(year, round_number, driver_id, driver_name):
+    """
+    Function to get the lap times for a driver in a race
+    Session state is needed in this function because variables will be reset between reruns
+    In this case the user will need to compare laps times data for different drivers by selecting them individually
+    By using the session state dataframe, the dataframe will not get reset when the user select another driver
+    Therefore, displaying lap times data for multiple drivers in a plot will be possible
+    """
+
     url = f'https://ergast.com/api/f1/{year}/{round_number}/laps.json?limit=10000'  # url to make request from
     data = make_request(url)
     if data['MRData']['total'] != '0':  # check if the json object have any lap times data
         laps_lst = []
         times_lst = []
         for dataItem in data['MRData']['RaceTable']['Races'][0]['Laps']:
-            laps_lst.append(dataItem['number'])     # append all the laps number to the laps list
+            laps_lst.append(dataItem['number'])  # append all the laps number to the laps list
             for x in range(len(dataItem['Timings'])):
                 if dataItem['Timings'][x]['driverId'] == driver_id:  # filter the data for the correct driver
-                    time = dataItem['Timings'][x]["time"]            # get the lap times for the driver
-                    time = str_time_to_sec(time)                # convert from str minutes and seconds to float seconds
-                    times_lst.append(time)                      # append the time to the time list
+                    time = dataItem['Timings'][x]["time"]  # get the lap times for the driver
+                    time = str_time_to_sec(time)  # convert from str minutes and seconds to float seconds
+                    times_lst.append(time)  # append the time to the time list
 
-        df_laps = pd.DataFrame({'Laps': laps_lst})          # create dataframes from the lists
+        df_laps = pd.DataFrame({'Laps': laps_lst})  # create dataframes from the lists
         df_times = pd.DataFrame({driver_name: times_lst})
 
         # if there is no laps column in the session dataframe
@@ -118,22 +141,22 @@ def get_laps_times(year, round_number, driver_id, driver_name):
         return False  # return false because there is no lap times data in the json object
 
 
-# Function to convert str minutes and seconds to float second
 def str_time_to_sec(time):
+    """Function to convert str minutes and seconds to float second"""
     m, s, f = re.split('[: .]', time)
     second = int(m) * 60 + int(s) + float(f) * 0.001
     return second
 
 
-# Function to get the selected driver id in the table
 def get_driver_id(table):
+    """Function to get the selected driver id in the table"""
     selected = table["selected_rows"]
     selected = selected[0]['DriverId']
     return selected
 
 
-# Function to get the selected driver name in the table
 def get_driver_name(table):
+    """Function to get the selected driver name in the table"""
     selected = table["selected_rows"]
     selected = selected[0]['Driver']
     return selected
