@@ -38,7 +38,7 @@ def make_request(url):
 
 def add_sidebar_select_box(label, options, index):
     """Function to add selection box to sidebar, return the current selected item"""
-    select_box = st.sidebar.selectbox(label, options, index)
+    select_box = st.sidebar.selectbox(label, options, 1)
     return select_box
 
 
