@@ -20,6 +20,15 @@ The following technologies and modules were utilized in the development of this 
 
 The Formula 1 Data Visualizer app is deployed on Streamlit Cloud. You can access it using the following URL: [https://formula1.streamlit.app](https://formula1-data.streamlit.app/)
 
+## Usage
+
+To run the Formula 1 Data Visualizer app locally, follow these steps:
+
+1.  Clone the repository:  `git clone https://github.com/hugo0024/Streamlit-Formula1-data-visualisation.git`
+2.  Install the required dependencies:  `pip install -r requirements.txt`
+3.  Run the application:  `streamlit run main.py`
+4.  Open your web browser and visit  `http://localhost:8501`
+
 ## Code Structure
 
 The code is organized as follows:
